@@ -1,0 +1,17 @@
+flask
+flask-sqlalchemy
+flask-migrate
+flask-bcrypt
+flask-jwt-extended
+python-dotenv
+numpy
+pandas
+scikit-learn
+tensorflow
+yfinance
+alpha-vantage
+streamlit
+dash
+plotly
+pycoingecko
+APScheduler
