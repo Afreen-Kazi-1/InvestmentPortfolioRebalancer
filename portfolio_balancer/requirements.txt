@@ -6,12 +6,9 @@ flask-jwt-extended
 python-dotenv
 numpy
 pandas
-scikit-learn
-tensorflow
 yfinance
-alpha-vantage
-streamlit
-dash
-plotly
 pycoingecko
-APScheduler
+psycopg2-binary
+celery
+redis
+gunicorn
