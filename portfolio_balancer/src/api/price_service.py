@@ -14,6 +14,13 @@ class PriceService:
     def __init__(self):
         pass
 
+    def _prices_to_dataframe(self, prices_dict):
+        """Converts a dictionary of prices {date: price} to a pandas DataFrame."""
+        df = pd.DataFrame.from_dict(prices_dict, orient='index', columns=['close_price'])
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
+        return df
+
     def _get_historical_data_from_db(self, ticker, start_date, end_date):
         """Fetches historical price data for a given ticker from the database."""
         response = supabase.table('price_history').select("*").eq("ticker", ticker).gte("date", start_date.isoformat()).lte("date", end_date.isoformat()).execute()
@@ -27,7 +34,7 @@ class PriceService:
             data_to_insert.append({
                 "ticker": ticker,
                 "date": date.isoformat(),
-                "close": row['Close']
+                "close": row['Close'] if 'Close' in row else row['close_price'] # Handle both 'Close' and 'close_price'
             })
         if data_to_insert:
             response = supabase.table('price_history').insert(data_to_insert).execute()

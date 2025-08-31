@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from portfolio_balancer.src.api.models import Portfolio, Asset
+from portfolio_balancer.src.api.models import Asset # Removed Portfolio as it's not used
 from portfolio_balancer.src.api.price_service import PriceService
-from portfolio_balancer.src.api.services import calculate_volatility, calculate_correlation
+from portfolio_balancer.src.evaluation.metrics import calculate_volatility, calculate_correlation # Corrected import path
 from supabase import create_client, Client
 import os
 import json
@@ -20,17 +20,15 @@ def precompute_common_stats():
     print("Starting nightly job: Precomputing common stats...")
 
     # Fetch all portfolios to get unique assets
-    response = supabase.table('portfolios').select("assets").execute()
-    all_assets_data = []
+    # Fetch all holdings to get unique assets, as 'portfolios' table does not exist
+    response = supabase.table('holding').select("ticker").execute()
+    unique_tickers = set()
     if response.data:
-        for portfolio_data in response.data:
-            if portfolio_data and 'assets' in portfolio_data:
-                all_assets_data.extend(portfolio_data['assets'])
+        for holding_data in response.data:
+            if 'ticker' in holding_data:
+                unique_tickers.add(holding_data['ticker'])
     
-    unique_assets = {} # ticker: Asset object
-    for asset_data in all_assets_data:
-        asset = Asset(**asset_data)
-        unique_assets[asset.ticker] = asset
+    tickers = list(unique_tickers)
 
     tickers = list(unique_assets.keys())
 
