@@ -19,10 +19,38 @@ const PortfolioEntry = () => {
     setHoldings(newHoldings);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the holdings to the backend
-    console.log(holdings);
+    // For demonstration, using a hardcoded user_id. In a real app, this would come from auth context.
+    const userId = 1;
+    const token = localStorage.getItem('token'); // Retrieve token from local storage
+
+    if (!token) {
+      alert('Authentication token not found. Please log in.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/holdings?user_id=${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+        },
+        body: JSON.stringify(holdings),
+      });
+
+      if (response.ok) {
+        alert('Holdings submitted successfully!');
+        setHoldings([{ ticker: '', quantity: '', avg_cost: '' }]); // Clear form
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to submit holdings: ${errorData.error || response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error submitting holdings:', error);
+      alert('Network error or server is unreachable.');
+    }
   };
 
   return (

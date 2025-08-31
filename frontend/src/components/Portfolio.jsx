@@ -4,9 +4,17 @@ const Portfolio = () => {
   const [holdings, setHoldings] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/portfolio')
-      .then(response => response.json())
-      .then(data => setHoldings(data))
+    const userId = 1; // Hardcoded for testing
+    fetch(`http://127.0.0.1:5000/api/user/${userId}/portfolio`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setHoldings(data);
+      })
       .catch(error => console.error('Error fetching portfolio:', error));
   }, []);
 

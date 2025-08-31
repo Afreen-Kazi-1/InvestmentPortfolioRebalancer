@@ -7,14 +7,44 @@ const CsvUpload = () => {
     setFile(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
       alert('Please select a file');
       return;
     }
-    // Here you would typically send the file to the backend for processing
-    console.log(file);
+
+    const userId = 1; // Hardcoded for demonstration
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Authentication token not found. Please log in.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/portfolio/import?user_id=${userId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}` // Include the token
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert('CSV uploaded successfully!');
+        setFile(null); // Clear the selected file
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to upload CSV: ${errorData.error || response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error uploading CSV:', error);
+      alert('Network error or server is unreachable.');
+    }
   };
 
   return (
